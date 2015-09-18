@@ -20,10 +20,10 @@ public class SmartSpaceTriplet {
         subjectType.toLowerCase();
         objectType.toLowerCase();
 
-        if (!subjectType.equals("uri") || !subjectType.equals("literal"))
+        if (!subjectType.equals("uri") && !subjectType.equals("literal"))
             throw new SmartSpaceException("Subject type must have \"uri\" or \"literal\" type - got " + subjectType);
 
-        if (!objectType.equals("uri") || !objectType.equals("literal"))
+        if (!objectType.equals("uri") && !objectType.equals("literal"))
             throw new SmartSpaceException("Object type must have \"uri\" or \"literal\" type - got " + objectType);
 
         this.subject = subject;
