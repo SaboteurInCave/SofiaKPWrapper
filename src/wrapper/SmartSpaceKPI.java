@@ -137,16 +137,16 @@ public class SmartSpaceKPI {
         for (int i = 0; i < subscriptionIdList.size(); i++) {
             SmartSpaceTriplet curTriplet = tripletList.get(i);
 
-            if (check2Strings(subject, curTriplet.getSubject(), fullMatch))
-                if (check2Strings(predicate, curTriplet.getPredicate(), fullMatch))
-                    if (check2Strings(object, curTriplet.getObject(), fullMatch)) {
-                        SIBResponse unsubscribeResponse = core.unsubscribe(subscriptionIdList.get(i));
+            if (checkTwoStrings(subject, curTriplet.getSubject(), fullMatch) &&
+                    checkTwoStrings(predicate, curTriplet.getPredicate(), fullMatch) &&
+                    checkTwoStrings(object, curTriplet.getObject(), fullMatch)) {
+                SIBResponse unsubscribeResponse = core.unsubscribe(subscriptionIdList.get(i));
 
-                        // у нас проблемы с отпиской от интеллектуального пространства
-                        if (!unsubscribeResponse.isConfirmed()) {
-                            exceptionMessage += subscriptionIdList.get(i) + ": " + unsubscribeResponse.Message + '\n';
-                        }
-                    }
+                // у нас проблемы с отпиской от интеллектуального пространства
+                if (!unsubscribeResponse.isConfirmed()) {
+                    exceptionMessage += subscriptionIdList.get(i) + ": " + unsubscribeResponse.Message + '\n';
+                }
+            }
         }
 
         // проблемы во время отписки были, сигнализируем это
@@ -155,7 +155,7 @@ public class SmartSpaceKPI {
         }
     }
 
-    private boolean check2Strings(String mainString, String curString, boolean fullMatch) {
+    private boolean checkTwoStrings(String mainString, String curString, boolean fullMatch) {
         if (mainString == null)
             if (fullMatch)
                 return (curString == null);
