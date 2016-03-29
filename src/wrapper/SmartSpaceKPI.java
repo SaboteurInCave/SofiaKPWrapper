@@ -81,12 +81,13 @@ public class SmartSpaceKPI {
         }
     }
 
-    public void subscribe(SmartSpaceTriplet triplet, iKPIC_subscribeHandler2 handler) throws SmartSpaceException {
+    public String subscribe(SmartSpaceTriplet triplet, iKPIC_subscribeHandler2 handler) throws SmartSpaceException {
         SIBResponse subscribeResponse = core.subscribeRDF(triplet.getSubject(), triplet.getPredicate(), triplet.getObject(), triplet.getObjectType(), handler);
 
         if (subscribeResponse != null && subscribeResponse.isConfirmed()) {
             subscriptionIdList.add(subscribeResponse.subscription_id);
             tripletList.add(triplet);
+            return subscribeResponse.subscription_id;
         } else {
             System.err.println("Some problems with subscribing");
             throw new SmartSpaceException(subscribeResponse != null ? subscribeResponse.Message : null);
@@ -129,22 +130,74 @@ public class SmartSpaceKPI {
         }
     }
 
+    public void unsubscribe(Iterable<String> subscriptionIds) throws SmartSpaceException {
+        String exceptionMessage = "";
+
+        for (String subscriptionId : subscriptionIds) {
+            try {
+                unsubscribe(subscriptionId);
+            } catch (SmartSpaceException e) {
+                exceptionMessage += e.getMessage() + "\n";
+            }
+        }
+
+        // проблемы во время отписки были, сигнализируем это
+        if (!exceptionMessage.isEmpty()) {
+            throw new SmartSpaceException(exceptionMessage);
+        }
+    }
+
+    public void unsubscribe(String subscriptionId) throws SmartSpaceException {
+        SIBResponse unsubscribeResponse = core.unsubscribe(subscriptionId);
+
+        // у нас проблемы с отпиской от интеллектуального пространства
+        if (!unsubscribeResponse.isConfirmed()) {
+            throw new SmartSpaceException(subscriptionId + ": " + unsubscribeResponse.Message + '\n');
+        } else {
+            int index = subscriptionIdList.indexOf(subscriptionId);
+            if (index >= 0) {
+                subscriptionIdList.remove(index);
+                tripletList.remove(index);
+            }
+        }
+    }
+
+    public void unsubscribe(Iterable<SmartSpaceTriplet> triplets, boolean fullMatch) throws SmartSpaceException {
+        String exceptionMessage = "";
+
+        for (SmartSpaceTriplet triplet : triplets)
+            try {
+                unsubscribe(triplet, fullMatch);
+            } catch (SmartSpaceException e) {
+                exceptionMessage += e.getMessage() + "\n";
+            }
+
+        // проблемы во время отписки были, сигнализируем это
+        if (!exceptionMessage.isEmpty()) {
+            throw new SmartSpaceException(exceptionMessage);
+        }
+    }
+
     public void unsubscribe(SmartSpaceTriplet triplet, boolean fullMatch) throws SmartSpaceException {
         String exceptionMessage = "";
 
         String subject = triplet.getSubject(), predicate = triplet.getPredicate(), object = triplet.getObject();
 
-        for (int i = 0; i < subscriptionIdList.size(); i++) {
+        ArrayList<String> oldIdList = new ArrayList<String>(subscriptionIdList);
+        for (int i = oldIdList.size() - 1; i >= 0; i--) {
             SmartSpaceTriplet curTriplet = tripletList.get(i);
 
             if (checkTwoStrings(subject, curTriplet.getSubject(), fullMatch) &&
                     checkTwoStrings(predicate, curTriplet.getPredicate(), fullMatch) &&
                     checkTwoStrings(object, curTriplet.getObject(), fullMatch)) {
-                SIBResponse unsubscribeResponse = core.unsubscribe(subscriptionIdList.get(i));
+                SIBResponse unsubscribeResponse = core.unsubscribe(oldIdList.get(i));
 
                 // у нас проблемы с отпиской от интеллектуального пространства
                 if (!unsubscribeResponse.isConfirmed()) {
-                    exceptionMessage += subscriptionIdList.get(i) + ": " + unsubscribeResponse.Message + '\n';
+                    exceptionMessage += oldIdList.get(i) + ": " + unsubscribeResponse.Message + '\n';
+                } else {
+                    subscriptionIdList.remove(i);
+                    tripletList.remove(i);
                 }
             }
         }
