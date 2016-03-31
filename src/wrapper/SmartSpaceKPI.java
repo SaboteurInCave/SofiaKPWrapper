@@ -130,8 +130,8 @@ public class SmartSpaceKPI {
         }
     }
 
- 
-public void unsubscribe(Iterable<String> subscriptionIds) throws SmartSpaceException {
+
+    public void unsubscribe(Iterable<String> subscriptionIds) throws SmartSpaceException {
         String exceptionMessage = "";
 
         for (String subscriptionId : subscriptionIds) {
@@ -163,7 +163,7 @@ public void unsubscribe(Iterable<String> subscriptionIds) throws SmartSpaceExcep
         }
     }
 
-    public void unsubscribe(Iterable<SmartSpaceTriplet> triplets, boolean fullMatch) throws SmartSpaceException {
+    public void unsubscribe(Iterable<SmartSpaceTriple> triplets, boolean fullMatch) throws SmartSpaceException {
         String exceptionMessage = "";
 
         for (SmartSpaceTriplet triplet : triplets)
@@ -179,7 +179,8 @@ public void unsubscribe(Iterable<String> subscriptionIds) throws SmartSpaceExcep
         }
     }
 
-public void unsubscribe(SmartSpaceTriplet triplet, boolean fullMatch) throws SmartSpaceException {        String exceptionMessage = "";
+    public void unsubscribe(SmartSpaceTriplet triplet, boolean fullMatch) throws SmartSpaceException {
+        String exceptionMessage = "";
 
         String subject = triplet.getSubject(), predicate = triplet.getPredicate(), object = triplet.getObject();
 
