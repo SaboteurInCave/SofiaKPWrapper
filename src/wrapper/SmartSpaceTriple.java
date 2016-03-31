@@ -4,10 +4,10 @@ package wrapper;
 
 import java.util.Vector;
 
-public class SmartSpaceTriplet {
+public class SmartSpaceTriple {
     private String subject, predicate, object, subjectType, objectType;
 
-    public SmartSpaceTriplet(String subject, String predicate, String object) {
+    public SmartSpaceTriple(String subject, String predicate, String object) {
         this.subject = subject;
         this.predicate = predicate;
         this.object = object;
@@ -15,7 +15,7 @@ public class SmartSpaceTriplet {
         this.objectType = "literal";
     }
 
-    public SmartSpaceTriplet(String subject, String predicate, String object, String subjectType, String objectType) throws SmartSpaceException {
+    public SmartSpaceTriple(String subject, String predicate, String object, String subjectType, String objectType) throws SmartSpaceException {
 
         subjectType.toLowerCase();
         objectType.toLowerCase();
@@ -33,7 +33,7 @@ public class SmartSpaceTriplet {
         this.objectType = objectType;
     }
 
-    public SmartSpaceTriplet(Vector<String> triplet) {
+    public SmartSpaceTriple(Vector<String> triplet) {
         switch (triplet.size()) {
             case 5: {
                 this.subject = triplet.elementAt(0);

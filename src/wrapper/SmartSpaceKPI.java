@@ -11,12 +11,12 @@ public class SmartSpaceKPI {
 
     private KPICore core;
     private ArrayList<String> subscriptionIdList;
-    private ArrayList<SmartSpaceTriplet> tripletList;
+    private ArrayList<SmartSpaceTriple> tripletList;
 
     public SmartSpaceKPI(String host, int port, String spaceName) throws SmartSpaceException {
         core = new KPICore(host, port, spaceName);
         subscriptionIdList = new ArrayList<String>();
-        tripletList = new ArrayList<SmartSpaceTriplet>();
+        tripletList = new ArrayList<SmartSpaceTriple>();
 
         SIBResponse joinResponse = core.join();
 
@@ -26,7 +26,7 @@ public class SmartSpaceKPI {
         core.disable_debug_message();
     }
 
-    public void insert(SmartSpaceTriplet triplet) throws SmartSpaceException {
+    public void insert(SmartSpaceTriple triplet) throws SmartSpaceException {
         SIBResponse insertResponse = core.insert(triplet.getSubject(), triplet.getPredicate(), triplet.getObject(), triplet.getSubjectType(), triplet.getObjectType());
         if (!insertResponse.isConfirmed()) {
             String text = String.format("KPI failed to insert triplet: (%s, %s, %s, %s, %s)",
@@ -37,7 +37,7 @@ public class SmartSpaceKPI {
         }
     }
 
-    public void remove(SmartSpaceTriplet triplet) throws SmartSpaceException {
+    public void remove(SmartSpaceTriple triplet) throws SmartSpaceException {
         SIBResponse removeResponse = core.remove(triplet.getSubject(), triplet.getPredicate(), triplet.getObject(), triplet.getSubjectType(), triplet.getObjectType());
         if (!removeResponse.isConfirmed()) {
             String text = String.format("KP failed to remove triplet: (%s, %s, %s, %s, %s)",
@@ -48,16 +48,16 @@ public class SmartSpaceKPI {
         }
     }
 
-    public Vector<SmartSpaceTriplet> query(SmartSpaceTriplet triplet) throws SmartSpaceException {
+    public Vector<SmartSpaceTriple> query(SmartSpaceTriple triplet) throws SmartSpaceException {
         SIBResponse queryResponse = core.queryRDF(triplet.getSubject(), triplet.getPredicate(), triplet.getObject(), triplet.getSubjectType(), triplet.getObjectType());
 
         if (queryResponse.isConfirmed()) {
             Vector<Vector<String>> stringVectorResult = queryResponse.query_results;
 
-            Vector<SmartSpaceTriplet> result = new Vector<SmartSpaceTriplet>();
+            Vector<SmartSpaceTriple> result = new Vector<SmartSpaceTriple>();
 
             for (Vector<String> it : stringVectorResult) {
-                result.add(new SmartSpaceTriplet(it));
+                result.add(new SmartSpaceTriple(it));
             }
 
             return result;
@@ -66,7 +66,7 @@ public class SmartSpaceKPI {
         }
     }
 
-    public void update(SmartSpaceTriplet newTriplet, SmartSpaceTriplet oldTriplet) throws SmartSpaceException {
+    public void update(SmartSpaceTriple newTriplet, SmartSpaceTriple oldTriplet) throws SmartSpaceException {
         SIBResponse updateResponse = core.update(
                 newTriplet.getSubject(), newTriplet.getPredicate(), newTriplet.getObject(), newTriplet.getSubjectType(), newTriplet.getObjectType(),
                 oldTriplet.getSubject(), oldTriplet.getPredicate(), oldTriplet.getObject(), oldTriplet.getSubjectType(), oldTriplet.getObjectType()
@@ -81,7 +81,7 @@ public class SmartSpaceKPI {
         }
     }
 
-    public void subscribe(SmartSpaceTriplet triplet, iKPIC_subscribeHandler2 handler) throws SmartSpaceException {
+    public void subscribe(SmartSpaceTriple triplet, iKPIC_subscribeHandler2 handler) throws SmartSpaceException {
         SIBResponse subscribeResponse = core.subscribeRDF(triplet.getSubject(), triplet.getPredicate(), triplet.getObject(), triplet.getObjectType(), handler);
 
         if (subscribeResponse != null && subscribeResponse.isConfirmed()) {
@@ -129,13 +129,13 @@ public class SmartSpaceKPI {
         }
     }
 
-    public void unsubscribe(SmartSpaceTriplet triplet, boolean fullMatch) throws SmartSpaceException {
+    public void unsubscribe(SmartSpaceTriple triplet, boolean fullMatch) throws SmartSpaceException {
         String exceptionMessage = "";
 
         String subject = triplet.getSubject(), predicate = triplet.getPredicate(), object = triplet.getObject();
 
         for (int i = 0; i < subscriptionIdList.size(); i++) {
-            SmartSpaceTriplet curTriplet = tripletList.get(i);
+            SmartSpaceTriple curTriplet = tripletList.get(i);
 
             if (checkTwoStrings(subject, curTriplet.getSubject(), fullMatch) &&
                     checkTwoStrings(predicate, curTriplet.getPredicate(), fullMatch) &&
@@ -157,10 +157,7 @@ public class SmartSpaceKPI {
 
     private boolean checkTwoStrings(String mainString, String curString, boolean fullMatch) {
         if (mainString == null)
-            if (fullMatch)
-                return (curString == null);
-            else
-                return true;
+            return !fullMatch || (curString == null);
         return mainString.equals(curString);
     }
 }
