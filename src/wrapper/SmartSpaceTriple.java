@@ -1,6 +1,6 @@
 package wrapper;
 
-// Class for triplets
+// Class for triples
 
 import java.util.Vector;
 
@@ -33,21 +33,21 @@ public class SmartSpaceTriple {
         this.objectType = objectType;
     }
 
-    public SmartSpaceTriple(Vector<String> triplet) {
-        switch (triplet.size()) {
+    public SmartSpaceTriple(Vector<String> triple) {
+        switch (triple.size()) {
             case 5: {
-                this.subject = triplet.elementAt(0);
-                this.predicate = triplet.elementAt(1);
-                this.object = triplet.elementAt(2);
-                this.subjectType = triplet.elementAt(3);
-                this.objectType = triplet.elementAt(4);
+                this.subject = triple.elementAt(0);
+                this.predicate = triple.elementAt(1);
+                this.object = triple.elementAt(2);
+                this.subjectType = triple.elementAt(3);
+                this.objectType = triple.elementAt(4);
             }
             case 4: {
-                this.subject = triplet.elementAt(0);
-                this.predicate = triplet.elementAt(1);
-                this.object = triplet.elementAt(2);
+                this.subject = triple.elementAt(0);
+                this.predicate = triple.elementAt(1);
+                this.object = triple.elementAt(2);
                 this.subjectType = "uri";
-                this.objectType = triplet.elementAt(3);
+                this.objectType = triple.elementAt(3);
             }
         }
     }
