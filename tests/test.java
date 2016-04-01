@@ -12,11 +12,13 @@ import java.util.Vector;
  */
 public class test {
     static SmartSpaceKPI smartSpaceKPI;
+    static SmartSpaceTriple testTriple;
     private final static boolean SSOnRouter = true;
 
     @BeforeClass
     public static void connect() {
         String routerHost = "192.168.1.1", PCHost = "192.168.2.101";
+        testTriple = new SmartSpaceTriple("testSubject", "testPredicate", "testObject");
         try {
             smartSpaceKPI = new SmartSpaceKPI(SSOnRouter ? routerHost : PCHost, 10010, "x");
         } catch (SmartSpaceException e) {
@@ -40,20 +42,38 @@ public class test {
                 && triple1.getObject().equals(triple2.getObject());
     }
 
+    private boolean insert(SmartSpaceTriple insertedTriple) {
+        Vector<SmartSpaceTriple> result = new Vector<SmartSpaceTriple>();
+        try {
+            smartSpaceKPI.remove(testTriple);
+            smartSpaceKPI.insert(testTriple);
+            result = smartSpaceKPI.query(testTriple);
+        } catch (SmartSpaceException e) {
+            e.printStackTrace();
+        }
+        return result.size() > 0 && triplesEquals(result.elementAt(0), testTriple);
+    }
+
     @Test
     public void insertTest() {
         if (smartSpaceKPI != null) {
-            SmartSpaceTriple testTriple = new SmartSpaceTriple("testSubject", "testPredicate", "testObject");
-            Vector<SmartSpaceTriple> result = new Vector<SmartSpaceTriple>();
-            try {
-                smartSpaceKPI.remove(testTriple);
-                smartSpaceKPI.insert(testTriple);
-                result = smartSpaceKPI.query(testTriple);
-            } catch (SmartSpaceException e) {
-                e.printStackTrace();
+            assert insert(testTriple);
+        }
+    }
+
+    @Test
+    public void removeTest() {
+        Vector<SmartSpaceTriple> result = new Vector<SmartSpaceTriple>();
+        if (smartSpaceKPI != null) {
+            if (insert(testTriple)) {
+                try {
+                    smartSpaceKPI.remove(testTriple);
+                    result = smartSpaceKPI.query(testTriple);
+                } catch (SmartSpaceException e) {
+                    e.printStackTrace();
+                }
+                assert result.size() == 0;
             }
-            assert result.size() > 0;
-            assert triplesEquals(result.elementAt(0), testTriple);
         }
     }
 }
